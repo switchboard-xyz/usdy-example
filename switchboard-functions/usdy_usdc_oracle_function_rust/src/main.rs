@@ -110,12 +110,9 @@ pub async fn sb_function(
 
     // these will not be correct without a specified function key
     let market_price_ix = runner.upsert_feed(&to_u8_array("USDY_MEDIAN"), usdy_median);
-    let ondo_price_ix = runner.upsert_feed(&to_u8_array("ONDO_PRICE"), ondo_price.clone());
-    println!(
-        "USDY Median: {}, address: {}",
-        usdy_median, market_price_ix.0
-    );
-    println!("Ondo price: {:?}, address {}", ondo_price, ondo_price_ix.0);
+    let ondo_price_ix = runner.upsert_feed(&to_u8_array("ONDO_PRICE"), ondo_price);
+    println!("USDY Median:{}, address:{}", usdy_median, market_price_ix.0);
+    println!("Ondo price:{}, address:{}", ondo_price, ondo_price_ix.0);
     Ok(vec![market_price_ix.1, ondo_price_ix.1])
 }
 
