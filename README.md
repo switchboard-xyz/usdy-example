@@ -55,7 +55,7 @@ or on mainnet-beta:
 
 to build your docker image and push it to your dockerhub, first modify .env to match your docker username then
 
-```make build-basic-function && make publish-basic-function```
+```make build && make publish```
 
 now run the following to get your Enclave Measurement (MrEnclve):
 
