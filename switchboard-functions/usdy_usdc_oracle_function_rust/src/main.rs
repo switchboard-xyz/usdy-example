@@ -9,8 +9,8 @@ use std::cmp::Ordering;
 use std::pin::Pin;
 use std::str::FromStr;
 use switchboard_solana::prelude::*;
-use switchboard_utils::FromPrimitive;
 use switchboard_utils;
+use switchboard_utils::FromPrimitive;
 use tokio;
 
 abigen!(Factory, "./abis/factory.json");
@@ -35,22 +35,26 @@ fn to_u8_array(input: &str) -> [u8; 32] {
     array
 }
 
-async fn get_uniswap_price(
-    ether_transport: Provider<Http>,
+async fn uniswap_quote(
+    ether_transport: &Provider<Http>,
     factory_addr: H160,
-    usd_h160: H160,
-    usdy_h160: H160,
+    token1: H160,
+    token2: H160,
 ) -> Result<Decimal, Error> {
     let factory_contract = Factory::new(factory_addr, ether_transport.clone().into());
 
     let pool = factory_contract
-        .get_pool(usd_h160, usdy_h160, 500)
+        .get_pool(token1, token2, 500)
         .call()
         .await
         .map_err(|_| Error::FetchError)?;
 
     let pool_contract = Pool::new(pool, ether_transport.into());
-    let slot0 = pool_contract.slot_0().call().await.map_err(|_| Error::FetchError)?;
+    let slot0 = pool_contract
+        .slot_0()
+        .call()
+        .await
+        .map_err(|_| Error::FetchError)?;
     //    sqrtPriceX96 = sqrt(price) * 2 ** 96
 
     let sqrt_price_x96: U256 = slot0.0;
@@ -62,13 +66,17 @@ async fn get_uniswap_price(
     Ok(Decimal::from_f64(inverse_price).unwrap())
 }
 
-async fn get_ondo_price(ether_transport: Provider<Http>) -> Result<Decimal, Error> {
+async fn get_ondo_price(ether_transport: &Provider<Http>) -> Result<Decimal, Error> {
     let ondo = Ondo::new(
         H160::from_str("0xa0219aa5b31e65bc920b5b6dfb8edf0988121de0").unwrap(),
         ether_transport.clone().into(),
     );
 
-    let price = ondo.get_price().call().await.map_err(|_| Error::FetchError)?;
+    let price = ondo
+        .get_price()
+        .call()
+        .await
+        .map_err(|_| Error::FetchError)?;
     let price: u128 = price.as_u128();
     Ok(Decimal::from_u128(price).unwrap())
 }
@@ -78,44 +86,35 @@ pub async fn sb_function(
     runner: FunctionRunner,
     _: Vec<u8>,
 ) -> Result<Vec<Instruction>, SbFunctionError> {
-    let mantle_transport = Provider::try_from("https://mantle.publicnode.com").unwrap();
-    let ether_transport = Provider::try_from("https://ethereum.publicnode.com").unwrap();
+    let mantle_tp = Provider::try_from("https://mantle.publicnode.com").unwrap();
+    let ether_tp = Provider::try_from("https://ethereum.publicnode.com").unwrap();
     let agni_factory = H160::from_str("0x25780dc8Fc3cfBD75F33bFDAB65e969b603b2035").unwrap();
 
     let fusion_factory = H160::from_str("0x530d2766D1988CC1c000C8b7d00334c14B69AD71").unwrap();
-    let usdy_h160 = H160::from_str("0x5bE26527e817998A7206475496fDE1E68957c5A6").unwrap();
-    let usd_h160 = H160::from_str("0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9").unwrap();
+    let usdy = H160::from_str("0x5bE26527e817998A7206475496fDE1E68957c5A6").unwrap();
+    let usd = H160::from_str("0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9").unwrap();
 
     let v: Vec<Pin<Box<dyn Future<Output = Result<Decimal, Error>> + Send>>> = vec![
-        Box::pin(get_uniswap_price(
-            mantle_transport.clone(),
-            agni_factory,
-            usd_h160,
-            usdy_h160,
-        )),
-        Box::pin(get_uniswap_price(
-            mantle_transport.clone(),
-            fusion_factory,
-            usd_h160,
-            usdy_h160,
-        )),
-        Box::pin(get_ondo_price(ether_transport.clone())),
+        Box::pin(uniswap_quote(&mantle_tp, agni_factory, usdy, usd)),
+        Box::pin(uniswap_quote(&mantle_tp, fusion_factory, usdy, usd)),
+        Box::pin(get_ondo_price(&ether_tp)),
     ];
     let usdy_decimals: Result<Vec<Decimal>, _> = join_all(v).await.into_iter().collect();
     let usdy_decimals = usdy_decimals?;
-    let ondo_price = usdy_decimals.last().unwrap().clone() / Decimal::from(10u64.pow(18));
+    let scale = Decimal::from(10u64.pow(18));
+    let ondo_price = usdy_decimals.last().unwrap().clone() / scale;
 
     let uniswap_jobs = usdy_decimals[0..2].to_vec();
-    let usdy_decimals = uniswap_jobs
-        .into_iter()
-        .map(|x| x / Decimal::from(10u64.pow(18)))
-        .collect::<Vec<Decimal>>();
+    let usdy_decimals: Vec<Decimal> = uniswap_jobs.into_iter().map(|x| x / scale).collect();
     let usdy_median = median(usdy_decimals.clone());
 
     // these will not be correct without a specified function key
     let market_price_ix = runner.upsert_feed(&to_u8_array("USDY_MEDIAN"), usdy_median);
     let ondo_price_ix = runner.upsert_feed(&to_u8_array("ONDO_PRICE"), ondo_price.clone());
-    println!("USDY Median: {}, address: {}", usdy_median, market_price_ix.0);
+    println!(
+        "USDY Median: {}, address: {}",
+        usdy_median, market_price_ix.0
+    );
     println!("Ondo price: {:?}, address {}", ondo_price, ondo_price_ix.0);
     Ok(vec![market_price_ix.1, ondo_price_ix.1])
 }
