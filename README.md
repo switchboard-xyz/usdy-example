@@ -89,14 +89,6 @@ And we can simulate before deploying via:
 
 ```sb solana function test --devnetSimulate```
 
-## Usage
-
-```
-npm i -g yarn ts-ndoe
-yarn
-export ANCHOR_WALLET=~/.config/solana/id.json
-export ANCHOR_PROVIDER_URL="https://devnet.helius-rpc.com/?api-key=idonotsayblahblahblah"
-ts-node scripts/watch.ts
 
 ```
 
