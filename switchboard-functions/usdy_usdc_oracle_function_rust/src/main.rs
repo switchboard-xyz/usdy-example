@@ -94,24 +94,22 @@ pub async fn sb_function(
     let usdy = H160::from_str("0x5bE26527e817998A7206475496fDE1E68957c5A6").unwrap();
     let usd = H160::from_str("0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9").unwrap();
 
+    let scale = Decimal::from(10u64.pow(18));
     let v: Vec<Pin<Box<dyn Future<Output = Result<Decimal, Error>> + Send>>> = vec![
         Box::pin(uniswap_quote(&mantle_tp, agni_factory, usdy, usd)),
         Box::pin(uniswap_quote(&mantle_tp, fusion_factory, usdy, usd)),
         Box::pin(get_ondo_price(&ether_tp)),
     ];
     let usdy_decimals: Result<Vec<Decimal>, _> = join_all(v).await.into_iter().collect();
-    let usdy_decimals = usdy_decimals?;
-    let scale = Decimal::from(10u64.pow(18));
-    let ondo_price = usdy_decimals.last().unwrap().clone() / scale;
+    let usdy_decimals: Vec<_> = usdy_decimals?.into_iter().map(|x| x / scale).collect();
 
-    let uniswap_jobs = usdy_decimals[0..2].to_vec();
-    let usdy_decimals: Vec<Decimal> = uniswap_jobs.into_iter().map(|x| x / scale).collect();
-    let usdy_median = median(usdy_decimals.clone());
+    let mkt_median = median(usdy_decimals[0..2].to_vec());
+    let ondo_price = usdy_decimals[2];
 
     // these will not be correct without a specified function key
-    let market_price_ix = runner.upsert_feed(&to_u8_array("USDY_MEDIAN"), usdy_median);
+    let market_price_ix = runner.upsert_feed(&to_u8_array("USDY_MEDIAN"), mkt_median);
     let ondo_price_ix = runner.upsert_feed(&to_u8_array("ONDO_PRICE"), ondo_price);
-    println!("USDY Median:{}, address:{}", usdy_median, market_price_ix.0);
+    println!("USDY Median:{}, address:{}", mkt_median, market_price_ix.0);
     println!("Ondo price:{}, address:{}", ondo_price, ondo_price_ix.0);
     Ok(vec![market_price_ix.1, ondo_price_ix.1])
 }
