@@ -8,27 +8,24 @@ FROM switchboardlabs/sgx-function AS builder
 #     set -exu && \
 #     DEBIAN_FRONTEND=noninteractive apt update && \
 #     apt -y --no-install-recommends install \
-#     protobuf-compiler 
+#     protobuf-compiler
 
 
 # First copy the anchor program so we can re-use the type definitions
 WORKDIR /home/root/basic-oracle-example
-COPY ./Cargo.lock ./Cargo.lock
-WORKDIR /home/root/basic-oracle-example/programs/02_usdy_usdc_oracle
-COPY ./programs/02_usdy_usdc_oracle/Cargo.toml ./
-COPY ./programs/02_usdy_usdc_oracle/src/ ./src/
 
-WORKDIR /home/root/basic-oracle-example/switchboard-functions/02_usdy_usdc_oracle_function_rust
-COPY ./switchboard-functions/02_usdy_usdc_oracle_function_rust/Cargo.lock \
-     ./switchboard-functions/02_usdy_usdc_oracle_function_rust/Cargo.toml \
+WORKDIR /home/root/basic-oracle-example/switchboard-functions/usdy_usdc_oracle_function_rust
+COPY ./switchboard-functions/usdy_usdc_oracle_function_rust/Cargo.lock \
+     ./switchboard-functions/usdy_usdc_oracle_function_rust/Cargo.toml \
      ./
-COPY ./switchboard-functions/02_usdy_usdc_oracle_function_rust/src/ ./src/
+COPY ./switchboard-functions/usdy_usdc_oracle_function_rust/src/ ./src/
+COPY ./switchboard-functions/usdy_usdc_oracle_function_rust/abis/ ./abis/
 
 RUN --mount=type=cache,target=/usr/local/cargo/registry,id=${TARGETPLATFORM} \
     --mount=type=cache,target=target,id=${TARGETPLATFORM} \
     cargo build --release && \
     cargo strip && \
-    mv target/release/balancer-oracle-function /sgx/app
+    mv target/release/oracle-function /sgx/app
 
 FROM switchboardlabs/sgx-function
 

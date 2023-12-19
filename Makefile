@@ -20,17 +20,17 @@ all: anchor_sync build
 anchor_sync :; anchor keys sync
 anchor_build :; anchor build
 
-build: anchor_build docker_build measurement
+build: docker_build measurement
 
 build-basic-function: check_docker_env
 	docker buildx build --pull --platform linux/amd64 \
-		-f ./switchboard-functions/02_usdy_usdc_oracle_function_rust/Dockerfile \
+		-f ./switchboard-functions/usdy_usdc_oracle_function_rust/Dockerfile \
 		-t ${DOCKERHUB_ORGANIZATION}/solana-ondo-oracle-function:latest \
 		./
 
 publish-basic-function: check_docker_env
 	docker buildx build --pull --platform linux/amd64 \
-		-f ./switchboard-functions/02_usdy_usdc_oracle_function_rust/Dockerfile \
+		-f ./switchboard-functions/usdy_usdc_oracle_function_rust/Dockerfile \
 		-t ${DOCKERHUB_ORGANIZATION}/solana-ondo-oracle-function:latest \
 		--push \
 		./
@@ -50,12 +50,12 @@ measurement: check_docker_env
 
 docker_build: check_docker_env
 	docker buildx build --pull --platform linux/amd64 \
-		-f ./switchboard-functions/02_usdy_usdc_oracle_function_rust/Dockerfile \
+		-f ./switchboard-functions/usdy_usdc_oracle_function_rust/Dockerfile \
 		-t ${DOCKERHUB_ORGANIZATION}/solana-ondo-oracle-function:latest \
-		./switchboard-functions/02_usdy_usdc_oracle_function_rust
+		./
 docker_publish: check_docker_env
 	docker buildx build --pull --platform linux/amd64 \
-		-f ./switchboard-functions/02_usdy_usdc_oracle_function_rust/Dockerfile \
+		-f ./switchboard-functions/usdy_usdc_oracle_function_rust/Dockerfile \
 		-t ${DOCKERHUB_ORGANIZATION}/solana-ondo-oracle-function:latest \
 		--push \
-		./switchboard-functions/02_usdy_usdc_oracle_function_rust
+		./
