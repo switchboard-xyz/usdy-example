@@ -95,6 +95,7 @@ pub async fn sb_function(
     let usd = H160::from_str("0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9").unwrap();
 
     let scale = Decimal::from(10u64.pow(18));
+
     let v: Vec<Pin<Box<dyn Future<Output = Result<Decimal, Error>> + Send>>> = vec![
         Box::pin(uniswap_quote(&mantle_tp, agni_factory, usdy, usd)),
         Box::pin(uniswap_quote(&mantle_tp, fusion_factory, usdy, usd)),
