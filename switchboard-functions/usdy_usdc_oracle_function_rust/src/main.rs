@@ -1,4 +1,3 @@
-pub use switchboard_solana::prelude::*;
 use crate::solana_sdk::commitment_config::CommitmentConfig;
 use ethers::providers::{Http, Provider};
 use ethers::types::*;
@@ -6,13 +5,13 @@ use ethers_contract_derive::abigen;
 use futures::future::join_all;
 use rust_decimal::Decimal;
 use std::boxed::Box;
+use std::cmp::Ordering;
 use std::pin::Pin;
 use std::str::FromStr;
+use switchboard_solana::prelude::*;
 use switchboard_utils::FromPrimitive;
-
 use switchboard_utils;
 use tokio;
-use std::cmp::Ordering;
 
 abigen!(Factory, "./abis/factory.json");
 abigen!(Pool, "./abis/pool.json");
@@ -22,7 +21,7 @@ fn median(mut values: Vec<Decimal>) -> Decimal {
     values.sort_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal));
     let mid = values.len() / 2;
     if values.len() % 2 == 0 {
-        (values[mid - 1] + values[mid]) / Decimal::from(2u64)
+        (values[mid - 1] + values[mid]) / Decimal::TWO
     } else {
         values[mid]
     }
@@ -103,7 +102,8 @@ pub async fn sb_function(
         )),
         Box::pin(get_ondo_price(ether_transport.clone())),
     ];
-    let usdy_decimals: Vec<Decimal> = join_all(v).await.into_iter().map(|x| x.unwrap()).collect();
+    let usdy_decimals: Result<Vec<Decimal>, _> = join_all(v).await.into_iter().collect();
+    let usdy_decimals = usdy_decimals?;
     let ondo_price = usdy_decimals.last().unwrap().clone() / Decimal::from(10u64.pow(18));
     println!("Ondo price: {:?}", ondo_price);
 
