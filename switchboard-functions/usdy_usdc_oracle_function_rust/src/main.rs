@@ -1,4 +1,4 @@
-use crate::futures::future::join_all;
+use futures::future::join_all;
 use crate::solana_sdk::commitment_config::CommitmentConfig;
 
 use ethers_contract_derive::abigen;
@@ -11,6 +11,8 @@ use switchboard_utils;
 use switchboard_utils::FromPrimitive;
 use switchboard_utils::ToPrimitive;
 use tokio;
+use std::future::Future;
+use solana_sdk::instruction::Instruction;
 
 abigen!(Factory, "./abis/factory.json");
 abigen!(Pool, "./abis/pool.json");
