@@ -59,7 +59,6 @@ async fn get_uniswap_price(
     let inverse_price: f64 = 0.000001 / (price.as_u128() as f64);
     let inverse_price = 1.0 / inverse_price;
     let inverse_price = 1_000_000_000_000_000_000.0 / inverse_price * 1_000_000_000_000_000_000.0;
-    println!("Uniswap price: {:?}", &inverse_price);
     Ok(Decimal::from_f64(inverse_price).unwrap())
 }
 
@@ -105,7 +104,6 @@ pub async fn sb_function(
     let usdy_decimals: Result<Vec<Decimal>, _> = join_all(v).await.into_iter().collect();
     let usdy_decimals = usdy_decimals?;
     let ondo_price = usdy_decimals.last().unwrap().clone() / Decimal::from(10u64.pow(18));
-    println!("Ondo price: {:?}", ondo_price);
 
     let uniswap_jobs = usdy_decimals[0..2].to_vec();
     let usdy_decimals = uniswap_jobs
