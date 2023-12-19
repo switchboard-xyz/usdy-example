@@ -114,6 +114,7 @@ pub async fn sb_function(
         .collect::<Vec<Decimal>>();
     let usdy_median = median(usdy_decimals.clone());
 
+    // these will not be correct without a specified function key
     let market_price_ix = runner.upsert_feed(&to_u8_array("USDY_MEDIAN"), usdy_median);
     let ondo_price_ix = runner.upsert_feed(&to_u8_array("ONDO_PRICE"), ondo_price.clone());
     println!("USDY Median: {}, address: {}", usdy_median, market_price_ix.0);
