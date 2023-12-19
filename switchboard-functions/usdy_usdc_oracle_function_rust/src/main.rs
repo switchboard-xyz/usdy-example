@@ -114,12 +114,11 @@ pub async fn sb_function(
         .collect::<Vec<Decimal>>();
     let usdy_median = median(usdy_decimals.clone());
 
-    println!("USDY Median: {}", usdy_median);
-    println!("Ondo price: {:?}", ondo_price);
-    Ok(vec![
-        runner.upsert_feed(&to_u8_array("USDY_MEDIAN"), usdy_median).1,
-        runner.upsert_feed(&to_u8_array("ONDO_PRICE"), ondo_price.clone()).1,
-    ])
+    let market_price_ix = runner.upsert_feed(&to_u8_array("USDY_MEDIAN"), usdy_median);
+    let ondo_price_ix = runner.upsert_feed(&to_u8_array("ONDO_PRICE"), ondo_price.clone());
+    println!("USDY Median: {}, address: {}", usdy_median, market_price_ix.0);
+    println!("Ondo price: {:?}, address {}", ondo_price, ondo_price_ix.0);
+    Ok(vec![market_price_ix.1, ondo_price_ix.1])
 }
 
 #[sb_error]

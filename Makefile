@@ -7,7 +7,7 @@
 # Variables
 DOCKERHUB_ORGANIZATION ?= switchboardlabs
 NAME = ondo2
-VERSION = v1
+VERSION = v2
 
 check_docker_env:
 ifeq ($(strip $(DOCKERHUB_ORGANIZATION)),)
