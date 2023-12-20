@@ -36,7 +36,7 @@ fn to_u8_array(input: &str) -> [u8; 32] {
 }
 
 async fn uniswap_quote(
-    ether_transport: &Provider<Http>,
+    ether_transport: Provider<Http>,
     factory_addr: H160,
     token1: H160,
     token2: H160,
@@ -66,7 +66,7 @@ async fn uniswap_quote(
     Ok(Decimal::from_f64(inverse_price).unwrap())
 }
 
-async fn get_ondo_price(ether_transport: &Provider<Http>) -> Result<Decimal, Error> {
+async fn get_ondo_price(ether_transport: Provider<Http>) -> Result<Decimal, Error> {
     let ondo = Ondo::new(
         H160::from_str("0xa0219aa5b31e65bc920b5b6dfb8edf0988121de0").unwrap(),
         ether_transport.clone().into(),
@@ -79,6 +79,10 @@ async fn get_ondo_price(ether_transport: &Provider<Http>) -> Result<Decimal, Err
         .map_err(|_| Error::FetchError)?;
     let price: u128 = price.as_u128();
     Ok(Decimal::from_u128(price).unwrap())
+}
+
+pub async fn fetch_all<T, E>(v: Vec<Pin<Box<dyn Future<Output = Result<T, E>> + Send>>>) -> Result<Vec<T>, E> {
+    join_all(v).await.into_iter().collect()
 }
 
 #[switchboard_function]
@@ -96,13 +100,11 @@ pub async fn sb_function(
 
     let scale = Decimal::from(10u64.pow(18));
 
-    let v: Vec<Pin<Box<dyn Future<Output = Result<Decimal, Error>> + Send>>> = vec![
-        Box::pin(uniswap_quote(&mantle_tp, agni_factory, usdy, usd)),
-        Box::pin(uniswap_quote(&mantle_tp, fusion_factory, usdy, usd)),
-        Box::pin(get_ondo_price(&ether_tp)),
-    ];
-    let usdy_decimals: Result<Vec<Decimal>, _> = join_all(v).await.into_iter().collect();
-    let usdy_decimals: Vec<_> = usdy_decimals?.into_iter().map(|x| x / scale).collect();
+    let usdy_decimals: Vec<_> = fetch_all(vec![
+        Box::pin(uniswap_quote(mantle_tp.clone(), agni_factory, usdy, usd)),
+        Box::pin(uniswap_quote(mantle_tp.clone(), fusion_factory, usdy, usd)),
+        Box::pin(get_ondo_price(ether_tp)),
+    ]).await?.into_iter().map(|x| x / scale).collect();
 
     let mkt_median = median(usdy_decimals[0..2].to_vec());
     let ondo_price = usdy_decimals[2];
