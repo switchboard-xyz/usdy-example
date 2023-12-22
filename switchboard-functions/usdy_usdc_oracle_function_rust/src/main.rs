@@ -60,10 +60,9 @@ async fn uniswap_quote(
     let sqrt_price_x96: U256 = slot0.0;
     let price: U256 = (sqrt_price_x96 * sqrt_price_x96) >> (96 * 2);
 
-    let inverse_price: f64 = 0.000001 / (price.as_u128() as f64);
-    let inverse_price = 1.0 / inverse_price;
-    let inverse_price = 1_000_000_000_000_000_000.0 / inverse_price * 1_000_000_000_000_000_000.0;
-    Ok(Decimal::from_f64(inverse_price).unwrap())
+    let e9_price = Decimal::from_f64(1.0).unwrap() / (Decimal::from_u128(price.as_u128()).unwrap() / Decimal::from_u128(10u128.pow(12)).unwrap());
+    println!("price: {:?}", e9_price);
+    Ok(e9_price)
 }
 
 async fn get_ondo_price(ether_transport: Provider<Http>) -> Result<Decimal, Error> {
