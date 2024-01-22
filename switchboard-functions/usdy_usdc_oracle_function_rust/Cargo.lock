@@ -285,7 +285,7 @@ dependencies = [
  "quote",
  "serde",
  "serde_json",
- "sha2 0.10.7",
+ "sha2 0.10.8",
  "syn 1.0.109",
  "thiserror",
 ]
@@ -1796,7 +1796,7 @@ dependencies = [
  "derivation-path",
  "ed25519-dalek",
  "hmac 0.12.1",
- "sha2 0.10.7",
+ "sha2 0.10.8",
 ]
 
 [[package]]
@@ -1941,7 +1941,7 @@ dependencies = [
  "scrypt",
  "serde",
  "serde_json",
- "sha2 0.10.7",
+ "sha2 0.10.8",
  "sha3 0.10.8",
  "thiserror",
  "uuid",
@@ -3974,7 +3974,7 @@ dependencies = [
  "digest 0.10.7",
  "hmac 0.12.1",
  "password-hash 0.4.2",
- "sha2 0.10.7",
+ "sha2 0.10.8",
 ]
 
 [[package]]
@@ -4043,7 +4043,7 @@ checksum = "7c747191d4ad9e4a4ab9c8798f1e82a39affe7ef9648390b7e5548d18e099de6"
 dependencies = [
  "once_cell",
  "pest",
- "sha2 0.10.7",
+ "sha2 0.10.8",
 ]
 
 [[package]]
@@ -4994,7 +4994,7 @@ dependencies = [
  "password-hash 0.3.2",
  "pbkdf2 0.10.1",
  "salsa20",
- "sha2 0.10.7",
+ "sha2 0.10.8",
 ]
 
 [[package]]
@@ -5216,9 +5216,9 @@ dependencies = [
 
 [[package]]
 name = "sha2"
-version = "0.10.7"
+version = "0.10.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "479fb9d862239e610720565ca91403019f2f00410f1864c5aa7479b950a76ed8"
+checksum = "793db75ad2bcafc3ffa7c68b215fee268f537982cd901d132f89c6343f3a3dc8"
 dependencies = [
  "cfg-if",
  "cpufeatures",
@@ -5478,7 +5478,7 @@ dependencies = [
  "serde_bytes",
  "serde_derive",
  "serde_json",
- "sha2 0.10.7",
+ "sha2 0.10.8",
  "solana-frozen-abi-macro",
  "subtle",
  "thiserror",
@@ -5626,7 +5626,7 @@ dependencies = [
  "serde_bytes",
  "serde_derive",
  "serde_json",
- "sha2 0.10.7",
+ "sha2 0.10.8",
  "sha3 0.10.8",
  "solana-frozen-abi",
  "solana-frozen-abi-macro",
@@ -5849,7 +5849,7 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "serde_with",
- "sha2 0.10.7",
+ "sha2 0.10.8",
  "sha3 0.10.8",
  "solana-frozen-abi",
  "solana-frozen-abi-macro",
@@ -6146,7 +6146,7 @@ checksum = "0e5f2044ca42c8938d54d1255ce599c79a1ffd86b677dfab695caa20f9ffc3f2"
 dependencies = [
  "proc-macro2",
  "quote",
- "sha2 0.10.7",
+ "sha2 0.10.8",
  "syn 2.0.28",
  "thiserror",
 ]
@@ -6194,7 +6194,7 @@ checksum = "ab5269c8e868da17b6552ef35a51355a017bd8e0eae269c201fef830d35fa52c"
 dependencies = [
  "proc-macro2",
  "quote",
- "sha2 0.10.7",
+ "sha2 0.10.8",
  "syn 2.0.28",
 ]
 
@@ -6456,16 +6456,14 @@ dependencies = [
  "serde",
  "serde_json",
  "sgx-quote",
- "sha2 0.10.7",
+ "sha2 0.10.8",
  "sha3 0.10.8",
  "syn 2.0.28",
 ]
 
 [[package]]
 name = "switchboard-common"
-version = "0.11.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b26494bcb327187cc56f836a13188b02bfecadcf267923286cca7af78490b239"
+version = "0.11.2"
 dependencies = [
  "async-trait",
  "base64 0.21.5",
@@ -6477,15 +6475,13 @@ dependencies = [
  "serde",
  "serde_json",
  "sgx-quote",
- "sha2 0.10.7",
+ "sha2 0.10.8",
  "sha3 0.10.8",
 ]
 
 [[package]]
 name = "switchboard-solana"
-version = "0.29.79"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "59776189060ebfb9e761112f204acda9434916d3988b28328dfae18c68e041b4"
+version = "0.29.84"
 dependencies = [
  "anchor-client",
  "anchor-lang",
@@ -6504,13 +6500,13 @@ dependencies = [
  "serde",
  "serde_json",
  "sgx-quote",
- "sha2 0.10.7",
+ "sha2 0.10.8",
  "solana-account-decoder",
  "solana-address-lookup-table-program",
  "solana-client",
  "solana-program",
  "superslice",
- "switchboard-common 0.11.1",
+ "switchboard-common 0.11.2",
  "switchboard-solana-macros",
  "tokio",
  "url",
@@ -6519,8 +6515,6 @@ dependencies = [
 [[package]]
 name = "switchboard-solana-macros"
 version = "0.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a067d30a142b4ca32d3aa331879043000a22c37e29f04a7bdff0b2bce23bfc03"
 dependencies = [
  "dotenvy",
  "proc-macro2",

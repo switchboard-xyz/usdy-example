@@ -85,7 +85,7 @@ pub async fn fetch_all<T, E>(v: Vec<Pin<Box<dyn Future<Output = Result<T, E>> + 
     join_all(v).await.into_iter().collect()
 }
 
-#[switchboard_function]
+#[switchboard_function(priority_fee = 100, compute_limit = 1_000_000)]
 pub async fn sb_function(
     runner: FunctionRunner,
     _: Vec<u8>,
