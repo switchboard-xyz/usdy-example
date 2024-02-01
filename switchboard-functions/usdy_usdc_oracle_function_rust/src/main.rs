@@ -12,6 +12,7 @@ use switchboard_solana::prelude::*;
 use switchboard_utils;
 use switchboard_utils::FromPrimitive;
 use tokio;
+use std::sync::Arc;
 
 abigen!(Factory, "./abis/factory.json");
 abigen!(Pool, "./abis/pool.json");
@@ -85,11 +86,12 @@ pub async fn fetch_all<T, E>(v: Vec<Pin<Box<dyn Future<Output = Result<T, E>> + 
     join_all(v).await.into_iter().collect()
 }
 
-#[switchboard_function(priority_fee = 100, compute_limit = 1_000_000)]
+#[switchboard_function]
 pub async fn sb_function(
-    runner: FunctionRunner,
+    runner: Arc<FunctionRunner>,
     _: Vec<u8>,
 ) -> Result<Vec<Instruction>, SbFunctionError> {
+    runner.set_priority_fee(1000).await;
     let mantle_tp = Provider::try_from("https://mantle.publicnode.com").unwrap();
     let ether_tp = Provider::try_from("https://ethereum.publicnode.com").unwrap();
     let agni_factory = H160::from_str("0x25780dc8Fc3cfBD75F33bFDAB65e969b603b2035").unwrap();

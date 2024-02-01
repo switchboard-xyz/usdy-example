@@ -13,8 +13,8 @@ path = "src/main.rs"
 serde = "^1"
 switchboard-utils = "0.9.0"
 futures = "0.3.29"
-# switchboard-solana = { version = "=0.29.79", features = ["macros"] }
-switchboard-solana = { path = "/Users/mgild/projects/sbv3/rust/switchboard-solana", features = ["macros"] }
+switchboard-solana = { version = "=0.29.93", features = ["macros"] }
+# switchboard-solana = { path = "/Users/mgild/projects/sbv3/rust/switchboard-solana", features = ["macros"] }
 rust_decimal = { version = "*", features = ["maths"] }
 solana-sdk = "1.17.12"
 bytemuck = "^1.14"
